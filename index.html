@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ST_TOUCHES() - PostGIS Función Espacial</title>
+    <meta name="description" content="Documentación y ejemplo de la función ST_TOUCHES() utilizando datos catastrales de Bogotá (La Candelaria).">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-glow: #38bdf8;
+            --accent-primary: #0ea5e9;
+            --accent-secondary: #ec4899;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(14, 165, 233, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.15) 0px, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Glassmorphism Cards */
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.6), 0 0 40px rgba(14, 165, 233, 0.1);
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(to right, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            letter-spacing: -1px;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        h2::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 24px;
+            background: var(--accent-primary);
+            border-radius: 4px;
+        }
+
+        p {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        /* Code Block */
+        .code-block {
+            background: #020617;
+            border-radius: 12px;
+            padding: 1.5rem;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.95rem;
+            color: #e2e8f0;
+            overflow-x: auto;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+        }
+
+        .code-block::before {
+            content: 'SQL';
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.2rem 0.6rem;
+            border-bottom-left-radius: 8px;
+            border-top-right-radius: 11px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+        }
+
+        .keyword { color: #c678dd; }
+        .function { color: #61afef; }
+        .string { color: #98c379; }
+        .comment { color: #5c6370; font-style: italic; }
+
+        /* Badge */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: rgba(14, 165, 233, 0.1);
+            color: var(--accent-glow);
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(14, 165, 233, 0.2);
+        }
+
+        /* Animations */
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Result Section */
+        .result-box {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 8px;
+            color: #34d399;
+            font-size: 0.95rem;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            .glass-card { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <header class="glass-card">
+            <span class="badge">Función Espacial - PostGIS</span>
+            <h1>ST_TOUCHES()</h1>
+            <p><strong>Descripción:</strong> Retorna <code>TRUE</code> si las geometrías tienen al menos un punto en común, pero sus interiores no se intersectan. Es la herramienta fundamental en bases de datos espaciales (como PostGIS) para determinar adyacencia o colindancia. Muy utilizada en el contexto catastral para encontrar lotes vecinos.</p>
+        </header>
+
+        <main class="glass-card">
+            <h2>Ejemplo Práctico: Localidad de La Candelaria, Bogotá</h2>
+            <p>Imagina que tenemos la base de datos local <code>lotes_candelaria</code> con los polígonos de todos los predios del centro histórico de Bogotá. Queremos encontrar cuáles son los <strong>lotes colindantes (vecinos)</strong> de un predio específico usando su código catastral.</p>
+            
+            <div class="code-block">
+<span class="comment">-- Consulta para encontrar lotes vecinos en La Candelaria (Bogotá)</span>
+<span class="keyword">SELECT</span> 
+    l1.lotcodigo <span class="keyword">AS</span> lote_origen, 
+    l2.lotcodigo <span class="keyword">AS</span> lote_vecino 
+<span class="keyword">FROM</span> 
+    lotes_candelaria l1 
+<span class="keyword">JOIN</span> 
+    lotes_candelaria l2 
+<span class="keyword">ON</span> 
+    <span class="function">ST_Touches</span>(l1.geom, l2.geom) 
+<span class="keyword">WHERE</span> 
+    l1.lotcodigo = <span class="string">'003201033096'</span>;
+            </div>
+
+            <div class="result-box">
+                <strong>💡 Explicación del caso de uso:</strong><br><br>
+                En el ejemplo de arriba, cruzamos la tabla <code>lotes_candelaria</code> consigo misma usando la función <code>ST_Touches</code> en la condición del <code>JOIN</code>. Esto nos devuelve automáticamente todos los lotes de Bogotá (La Candelaria) que comparten un lindero o vértice con el predio <code>003201033096</code>, descartando aquellos que se sobreponen (lo cual indicaría un error topológico en el catastro).
+            </div>
+        </main>
+
+    </div>
+
+</body>
+</html>
