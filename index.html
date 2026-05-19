@@ -316,7 +316,7 @@
 
             <div id="query-results" class="results-container">
                 <div id="map"></div>
-                <span class="row-count">Resultados: 1 fila retornada</span>
+                <span class="row-count">Resultados: 4 filas retornadas</span>
                 <table>
                     <thead>
                         <tr>
@@ -328,6 +328,18 @@
                         <tr>
                             <td>003201033096</td>
                             <td>003201033094</td>
+                        </tr>
+                        <tr>
+                            <td>003201033096</td>
+                            <td>003203001015</td>
+                        </tr>
+                        <tr>
+                            <td>003201033096</td>
+                            <td>003203001012</td>
+                        </tr>
+                        <tr>
+                            <td>003201033096</td>
+                            <td>003203001013</td>
                         </tr>
                     </tbody>
                 </table>
@@ -356,7 +368,7 @@
             [4.594480708, -74.081587955], [4.594531320, -74.081676372]
         ];
 
-        const vecinoCoords = [
+        const vecino1Coords = [
             [4.594633539, -74.081602742], [4.594496640, -74.081369829], 
             [4.594451203, -74.081399336], [4.594478129, -74.081441092], 
             [4.594462526, -74.081450192], [4.594533292, -74.081570701], 
@@ -364,6 +376,27 @@
             [4.594581155, -74.081637987], [4.594583396, -74.081641902], 
             [4.594591234, -74.081655594], [4.594613008, -74.081639484], 
             [4.594643402, -74.081619298]
+        ];
+
+        const vecino2Coords = [
+            [4.594955941, -74.081011861], [4.594933158, -74.080970966], 
+            [4.594802274, -74.081042955], [4.594796759, -74.081032596], 
+            [4.594676630, -74.081095306], [4.594708636, -74.081156198], 
+            [4.594955941, -74.081011861]
+        ];
+
+        const vecino3Coords = [
+            [4.594570798, -74.081235188], [4.594521965, -74.081148869], 
+            [4.594487885, -74.081088389], [4.594422005, -74.080971762], 
+            [4.594392575, -74.080989413], [4.594329066, -74.081027503], 
+            [4.594398203, -74.081149983], [4.594438095, -74.081220642], 
+            [4.594478059, -74.081291260], [4.594570798, -74.081235188]
+        ];
+
+        const vecino4Coords = [
+            [4.594618970, -74.081208546], [4.594570238, -74.081122161], 
+            [4.594521965, -74.081148869], [4.594570798, -74.081235188], 
+            [4.594618970, -74.081208546]
         ];
 
         function simulateQuery() {
@@ -402,16 +435,40 @@
             }).addTo(map);
             origenPolygon.bindPopup('<b>Predio Origen</b><br>ID: 003201033096');
 
-            const vecinoPolygon = L.polygon(vecinoCoords, {
+            const vecino1Polygon = L.polygon(vecino1Coords, {
                 color: '#ec4899',
                 fillColor: '#ec4899',
                 fillOpacity: 0.4,
                 weight: 2
             }).addTo(map);
-            vecinoPolygon.bindPopup('<b>Predio Vecino (ST_Touches)</b><br>ID: 003201033094');
+            vecino1Polygon.bindPopup('<b>Predio Vecino 1</b><br>ID: 003201033094');
+
+            const vecino2Polygon = L.polygon(vecino2Coords, {
+                color: '#8b5cf6',
+                fillColor: '#8b5cf6',
+                fillOpacity: 0.4,
+                weight: 2
+            }).addTo(map);
+            vecino2Polygon.bindPopup('<b>Predio Vecino 2</b><br>ID: 003203001015');
+
+            const vecino3Polygon = L.polygon(vecino3Coords, {
+                color: '#10b981',
+                fillColor: '#10b981',
+                fillOpacity: 0.4,
+                weight: 2
+            }).addTo(map);
+            vecino3Polygon.bindPopup('<b>Predio Vecino 3</b><br>ID: 003203001012');
+
+            const vecino4Polygon = L.polygon(vecino4Coords, {
+                color: '#f59e0b',
+                fillColor: '#f59e0b',
+                fillOpacity: 0.4,
+                weight: 2
+            }).addTo(map);
+            vecino4Polygon.bindPopup('<b>Predio Vecino 4</b><br>ID: 003203001013');
 
             // Fit map to polygons
-            const group = new L.featureGroup([origenPolygon, vecinoPolygon]);
+            const group = new L.featureGroup([origenPolygon, vecino1Polygon, vecino2Polygon, vecino3Polygon, vecino4Polygon]);
             map.fitBounds(group.getBounds(), { padding: [30, 30] });
         }
     </script>
