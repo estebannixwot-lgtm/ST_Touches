@@ -175,6 +175,82 @@
             font-size: 0.95rem;
         }
 
+        /* Interactive Code Block */
+        .code-block.interactive {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .code-block.interactive:hover {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 15px rgba(14, 165, 233, 0.2);
+        }
+        .code-block.interactive::after {
+            content: '▶ Ejecutar Consulta';
+            position: absolute;
+            bottom: 1rem;
+            right: 1.5rem;
+            background: var(--accent-primary);
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .code-block.interactive:hover::after {
+            opacity: 1;
+        }
+
+        /* Results Table */
+        .results-container {
+            display: none;
+            margin-top: 1.5rem;
+            animation: fadeInDown 0.5s ease forwards;
+        }
+        .results-container.visible {
+            display: block;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        th, td {
+            padding: 1rem 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        th {
+            background: rgba(14, 165, 233, 0.15);
+            color: var(--accent-glow);
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .row-count {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            display: inline-block;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         @media (max-width: 768px) {
             h1 { font-size: 2.5rem; }
             .glass-card { padding: 1.5rem; }
@@ -195,7 +271,7 @@
             <h2>Ejemplo Práctico: Localidad de La Candelaria, Bogotá</h2>
             <p>Imagina que tenemos la base de datos local <code>lotes_candelaria</code> con los polígonos de todos los predios del centro histórico de Bogotá. Queremos encontrar cuáles son los <strong>lotes colindantes (vecinos)</strong> de un predio específico usando su código catastral.</p>
             
-            <div class="code-block">
+            <div class="code-block interactive" onclick="simulateQuery()">
 <span class="comment">-- Consulta para encontrar lotes vecinos en La Candelaria (Bogotá)</span>
 <span class="keyword">SELECT</span> 
     l1.lotcodigo <span class="keyword">AS</span> lote_origen, 
@@ -210,13 +286,55 @@
     l1.lotcodigo = <span class="string">'003201033096'</span>;
             </div>
 
+            <div id="query-results" class="results-container">
+                <span class="row-count">Resultados: 4 filas retornadas</span>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>lote_origen</th>
+                            <th>lote_vecino</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>003201033096</td>
+                            <td>003201033094</td>
+                        </tr>
+                        <tr>
+                            <td>003201033096</td>
+                            <td>003103015008</td>
+                        </tr>
+                        <tr>
+                            <td>003201033096</td>
+                            <td>003104006022</td>
+                        </tr>
+                        <tr>
+                            <td>003201033096</td>
+                            <td>003104006015</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
             <div class="result-box">
                 <strong>💡 Explicación del caso de uso:</strong><br><br>
-                En el ejemplo de arriba, cruzamos la tabla <code>lotes_candelaria</code> consigo misma usando la función <code>ST_Touches</code> en la condición del <code>JOIN</code>. Esto nos devuelve automáticamente todos los lotes de Bogotá (La Candelaria) que comparten un lindero o vértice con el predio <code>003201033096</code>, descartando aquellos que se sobreponen (lo cual indicaría un error topológico en el catastro).
+                En el ejemplo de arriba, cruzamos la tabla <code>lotes_candelaria</code> consigo misma usando la función <code>ST_Touches</code> en la condición del <code>JOIN</code>. Al darle clic al cuadro de código, simulamos la ejecución de la consulta. Esto nos devuelve automáticamente todos los lotes de Bogotá (La Candelaria) que comparten un lindero o vértice con el predio <code>003201033096</code>, descartando aquellos que se sobreponen (lo cual indicaría un error topológico en el catastro).
             </div>
         </main>
 
     </div>
 
+    <script>
+        function simulateQuery() {
+            const results = document.getElementById('query-results');
+            if (!results.classList.contains('visible')) {
+                results.classList.add('visible');
+                // Scroll smoothly to results
+                setTimeout(() => {
+                    results.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, 100);
+            }
+        }
+    </script>
 </body>
 </html>
