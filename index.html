@@ -11,6 +11,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    
     <style>
         :root {
             --bg-color: #0f172a;
@@ -246,6 +249,31 @@
             display: inline-block;
         }
 
+        /* Map Container */
+        #map {
+            height: 350px;
+            width: 100%;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1;
+        }
+
+        /* Customize Leaflet Popup for Dark Theme */
+        .leaflet-popup-content-wrapper {
+            background: var(--card-bg);
+            color: var(--text-main);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+        .leaflet-popup-tip {
+            background: var(--card-bg);
+        }
+        .leaflet-container a.leaflet-popup-close-button {
+            color: var(--text-muted);
+        }
+
         @keyframes fadeInDown {
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -287,7 +315,8 @@
             </div>
 
             <div id="query-results" class="results-container">
-                <span class="row-count">Resultados: 4 filas retornadas</span>
+                <div id="map"></div>
+                <span class="row-count">Resultados: 1 fila retornada</span>
                 <table>
                     <thead>
                         <tr>
@@ -299,18 +328,6 @@
                         <tr>
                             <td>003201033096</td>
                             <td>003201033094</td>
-                        </tr>
-                        <tr>
-                            <td>003201033096</td>
-                            <td>003103015008</td>
-                        </tr>
-                        <tr>
-                            <td>003201033096</td>
-                            <td>003104006022</td>
-                        </tr>
-                        <tr>
-                            <td>003201033096</td>
-                            <td>003104006015</td>
                         </tr>
                     </tbody>
                 </table>
@@ -324,7 +341,31 @@
 
     </div>
 
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script>
+        let mapInitialized = false;
+
+        // Coordenadas reales extraídas de Candelaria_Limpio.sql
+        const origenCoords = [
+            [4.594583396, -74.081641902], [4.594581155, -74.081637987], 
+            [4.594570613, -74.081644965], [4.594528611, -74.081573431], 
+            [4.594533292, -74.081570701], [4.594462526, -74.081450192], 
+            [4.594478129, -74.081441092], [4.594451203, -74.081399336], 
+            [4.594392471, -74.081433807], [4.594431441, -74.081501886], 
+            [4.594480708, -74.081587955], [4.594531320, -74.081676372]
+        ];
+
+        const vecinoCoords = [
+            [4.594633539, -74.081602742], [4.594496640, -74.081369829], 
+            [4.594451203, -74.081399336], [4.594478129, -74.081441092], 
+            [4.594462526, -74.081450192], [4.594533292, -74.081570701], 
+            [4.594528611, -74.081573431], [4.594570613, -74.081644965], 
+            [4.594581155, -74.081637987], [4.594583396, -74.081641902], 
+            [4.594591234, -74.081655594], [4.594613008, -74.081639484], 
+            [4.594643402, -74.081619298]
+        ];
+
         function simulateQuery() {
             const results = document.getElementById('query-results');
             if (!results.classList.contains('visible')) {
@@ -332,8 +373,46 @@
                 // Scroll smoothly to results
                 setTimeout(() => {
                     results.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    if (!mapInitialized) {
+                        initMap();
+                        mapInitialized = true;
+                    }
                 }, 100);
             }
+        }
+
+        function initMap() {
+            const map = L.map('map', {
+                zoomControl: true,
+                scrollWheelZoom: false
+            }).setView([4.5945, -74.0815], 19);
+
+            // Dark theme map tiles (CartoDB Dark Matter)
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                subdomains: 'abcd',
+                maxZoom: 21
+            }).addTo(map);
+
+            const origenPolygon = L.polygon(origenCoords, {
+                color: '#0ea5e9',
+                fillColor: '#0ea5e9',
+                fillOpacity: 0.4,
+                weight: 2
+            }).addTo(map);
+            origenPolygon.bindPopup('<b>Predio Origen</b><br>ID: 003201033096');
+
+            const vecinoPolygon = L.polygon(vecinoCoords, {
+                color: '#ec4899',
+                fillColor: '#ec4899',
+                fillOpacity: 0.4,
+                weight: 2
+            }).addTo(map);
+            vecinoPolygon.bindPopup('<b>Predio Vecino (ST_Touches)</b><br>ID: 003201033094');
+
+            // Fit map to polygons
+            const group = new L.featureGroup([origenPolygon, vecinoPolygon]);
+            map.fitBounds(group.getBounds(), { padding: [30, 30] });
         }
     </script>
 </body>
