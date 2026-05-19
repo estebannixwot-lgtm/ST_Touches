@@ -311,12 +311,12 @@
 <span class="keyword">ON</span> 
     <span class="function">ST_Touches</span>(l1.geom, l2.geom) 
 <span class="keyword">WHERE</span> 
-    l1.lotcodigo = <span class="string">'003201033096'</span>;
+    l1.lotcodigo = <span class="string">'003104006015'</span>;
             </div>
 
             <div id="query-results" class="results-container">
                 <div id="map"></div>
-                <span class="row-count">Resultados: 4 filas retornadas</span>
+                <span class="row-count">Resultados: 8 filas retornadas</span>
                 <table>
                     <thead>
                         <tr>
@@ -325,29 +325,21 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>003201033096</td>
-                            <td>003201033094</td>
-                        </tr>
-                        <tr>
-                            <td>003201033096</td>
-                            <td>003203001015</td>
-                        </tr>
-                        <tr>
-                            <td>003201033096</td>
-                            <td>003203001012</td>
-                        </tr>
-                        <tr>
-                            <td>003201033096</td>
-                            <td>003203001013</td>
-                        </tr>
+                        <tr><td>003104006015</td><td>003104006006</td></tr>
+                        <tr><td>003104006015</td><td>003104006010</td></tr>
+                        <tr><td>003104006015</td><td>003104006007</td></tr>
+                        <tr><td>003104006015</td><td>003104006011</td></tr>
+                        <tr><td>003104006015</td><td>003104006012</td></tr>
+                        <tr><td>003104006015</td><td>003104006013</td></tr>
+                        <tr><td>003104006015</td><td>003104006014</td></tr>
+                        <tr><td>003104006015</td><td>003104006024</td></tr>
                     </tbody>
                 </table>
             </div>
 
             <div class="result-box">
                 <strong>💡 Explicación del caso de uso:</strong><br><br>
-                En el ejemplo de arriba, cruzamos la tabla <code>lotes_candelaria</code> consigo misma usando la función <code>ST_Touches</code> en la condición del <code>JOIN</code>. Al darle clic al cuadro de código, simulamos la ejecución de la consulta. Esto nos devuelve automáticamente todos los lotes de Bogotá (La Candelaria) que comparten un lindero o vértice con el predio <code>003201033096</code>, descartando aquellos que se sobreponen (lo cual indicaría un error topológico en el catastro).
+                En el ejemplo de arriba, cruzamos la tabla <code>lotes_candelaria</code> consigo misma usando la función <code>ST_Touches</code> en la condición del <code>JOIN</code>. Al darle clic al cuadro de código, simulamos la ejecución de la consulta. Esto nos devuelve automáticamente todos los lotes de Bogotá (La Candelaria) que comparten un lindero o vértice con el predio <code>003104006015</code>, descartando aquellos que se sobreponen (lo cual indicaría un error topológico en el catastro).
             </div>
         </main>
 
@@ -359,45 +351,21 @@
         let mapInitialized = false;
 
         // Coordenadas reales extraídas de Candelaria_Limpio.sql
+        // Lote de origen: 003104006015
         const origenCoords = [
-            [4.594583396, -74.081641902], [4.594581155, -74.081637987], 
-            [4.594570613, -74.081644965], [4.594528611, -74.081573431], 
-            [4.594533292, -74.081570701], [4.594462526, -74.081450192], 
-            [4.594478129, -74.081441092], [4.594451203, -74.081399336], 
-            [4.594392471, -74.081433807], [4.594431441, -74.081501886], 
-            [4.594480708, -74.081587955], [4.594531320, -74.081676372]
+            [4.59765714899998557, -74.06904568800001698], [4.59761124499999596, -74.06906897200002504], [4.59762106400000903, -74.06908720400002721], [4.5976261580000255, -74.06909668100001909], [4.59763812300002428, -74.06911893400001645], [4.59764514699998017, -74.0691147649999948], [4.59767835200000263, -74.06909460700001091], [4.59769690000001674, -74.06908337099997652], [4.59770772699999952, -74.06907681299998103], [4.59776945499999101, -74.06903934700000036], [4.59778836800001045, -74.0690278750000175], [4.59788141699999642, -74.06897143700001607], [4.59787221999999929, -74.06893659899998283], [4.59779794899998251, -74.06897427199999129], [4.59776974400000427, -74.06898857700002736], [4.59774880999998459, -74.06899919500000351], [4.59774853999999777, -74.06899933199997577], [4.59771190300000399, -74.06901791600000706], [4.59766199500000994, -74.06904322999997703], [4.59765714899998557, -74.06904568800001698]
         ];
 
-        const vecino1Coords = [
-            [4.594633539, -74.081602742], [4.594496640, -74.081369829], 
-            [4.594451203, -74.081399336], [4.594478129, -74.081441092], 
-            [4.594462526, -74.081450192], [4.594533292, -74.081570701], 
-            [4.594528611, -74.081573431], [4.594570613, -74.081644965], 
-            [4.594581155, -74.081637987], [4.594583396, -74.081641902], 
-            [4.594591234, -74.081655594], [4.594613008, -74.081639484], 
-            [4.594643402, -74.081619298]
-        ];
+        // 8 Vecinos
+        const vecino1Coords = [[4.597575753, -74.069035422], [4.597501565, -74.069078554], [4.597535283, -74.069139195], [4.597587853, -74.069107332], [4.597621064, -74.069087204], [4.597611244, -74.069068972], [4.597607401, -74.069061825], [4.597589031, -74.069027700], [4.597575753, -74.069035422]]; // 003104006006
+        const vecino2Coords = [[4.597638123, -74.069118934], [4.597615772, -74.069132559], [4.597651907, -74.069206146], [4.597659861, -74.069222346], [4.597691283, -74.069204566], [4.597683016, -74.069188476], [4.597645146, -74.069114764], [4.597638123, -74.069118934]]; // 003104006010
+        const vecino3Coords = [[4.597626158, -74.069096681], [4.597621064, -74.069087204], [4.597587853, -74.069107332], [4.597535283, -74.069139195], [4.597552412, -74.069170997], [4.597583348, -74.069152229], [4.597602714, -74.069140480], [4.597615772, -74.069132559], [4.597638123, -74.069118934], [4.597626158, -74.069096681]]; // 003104006007
+        const vecino4Coords = [[4.597678352, -74.069094607], [4.597645146, -74.069114764], [4.597683016, -74.069188476], [4.597691283, -74.069204566], [4.597723346, -74.069186020], [4.597678352, -74.069094607]]; // 003104006011
+        const vecino5Coords = [[4.597707726, -74.069076812], [4.597696900, -74.069083370], [4.597678352, -74.069094607], [4.597723346, -74.069186020], [4.597753861, -74.069166616], [4.597707726, -74.069076812]]; // 003104006012
+        const vecino6Coords = [[4.597769454, -74.069039347], [4.597707726, -74.069076812], [4.597753861, -74.069166616], [4.597815591, -74.069129150], [4.597769454, -74.069039347]]; // 003104006013
+        const vecino7Coords = [[4.597788368, -74.069027875], [4.597769454, -74.069039347], [4.597815591, -74.069129150], [4.597886470, -74.069085844], [4.597905702, -74.069074092], [4.597900508, -74.069052135], [4.597881416, -74.068971437], [4.597788368, -74.069027875]]; // 003104006014
+        const vecino8Coords = [[4.597832594, -74.068768238], [4.597795301, -74.068788524], [4.597821668, -74.068836750], [4.597778660, -74.068856637], [4.597754398, -74.068867855], [4.597749825, -74.068869968], [4.597748690, -74.068870494], [4.597745379, -74.068872026], [4.597733350, -74.068877586], [4.597725217, -74.068881347], [4.597724469, -74.068881694], [4.597722416, -74.068882642], [4.597713404, -74.068886809], [4.597670790, -74.068906513], [4.597669170, -74.068902829], [4.597667684, -74.068899454], [4.597661141, -74.068884582], [4.597656782, -74.068874675], [4.597647857, -74.068854391], [4.597635215, -74.068825661], [4.597630489, -74.068828501], [4.597624052, -74.068831380], [4.597562852, -74.068858732], [4.597513482, -74.068887001], [4.597528522, -74.068915155], [4.597531376, -74.068920497], [4.597539573, -74.068935710], [4.597541078, -74.068938503], [4.597548078, -74.068951497], [4.597551470, -74.068957792], [4.597553054, -74.068960732], [4.597556284, -74.068966729], [4.597557000, -74.068968057], [4.597557444, -74.068968881], [4.597560004, -74.068973647], [4.597574950, -74.069001462], [4.597577543, -74.069006288], [4.597580327, -74.069011464], [4.597589031, -74.069027700], [4.597607401, -74.069061825], [4.597611244, -74.069068972], [4.597657148, -74.069045688], [4.597661995, -74.069043229], [4.597711903, -74.069017916], [4.597748539, -74.068999331], [4.597748809, -74.068999195], [4.597769744, -74.068988577], [4.597797948, -74.068974271], [4.597872219, -74.068936598], [4.597857866, -74.068874273], [4.597832594, -74.068768238]]; // 003104006024
 
-        const vecino2Coords = [
-            [4.594955941, -74.081011861], [4.594933158, -74.080970966], 
-            [4.594802274, -74.081042955], [4.594796759, -74.081032596], 
-            [4.594676630, -74.081095306], [4.594708636, -74.081156198], 
-            [4.594955941, -74.081011861]
-        ];
-
-        const vecino3Coords = [
-            [4.594570798, -74.081235188], [4.594521965, -74.081148869], 
-            [4.594487885, -74.081088389], [4.594422005, -74.080971762], 
-            [4.594392575, -74.080989413], [4.594329066, -74.081027503], 
-            [4.594398203, -74.081149983], [4.594438095, -74.081220642], 
-            [4.594478059, -74.081291260], [4.594570798, -74.081235188]
-        ];
-
-        const vecino4Coords = [
-            [4.594618970, -74.081208546], [4.594570238, -74.081122161], 
-            [4.594521965, -74.081148869], [4.594570798, -74.081235188], 
-            [4.594618970, -74.081208546]
-        ];
 
         function simulateQuery() {
             const results = document.getElementById('query-results');
@@ -418,7 +386,7 @@
             const map = L.map('map', {
                 zoomControl: true,
                 scrollWheelZoom: false
-            }).setView([4.5945, -74.0815], 19);
+            }).setView([4.59765, -74.0690], 19);
 
             // Dark theme map tiles (CartoDB Dark Matter)
             L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
@@ -433,42 +401,27 @@
                 fillOpacity: 0.4,
                 weight: 2
             }).addTo(map);
-            origenPolygon.bindPopup('<b>Predio Origen</b><br>ID: 003201033096');
+            origenPolygon.bindPopup('<b>Predio Origen</b><br>ID: 003104006015');
 
-            const vecino1Polygon = L.polygon(vecino1Coords, {
-                color: '#ec4899',
-                fillColor: '#ec4899',
-                fillOpacity: 0.4,
-                weight: 2
-            }).addTo(map);
-            vecino1Polygon.bindPopup('<b>Predio Vecino 1</b><br>ID: 003201033094');
+            // Arrays of pretty colors for the neighbors
+            const colors = ['#ec4899', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#14b8a6', '#6366f1', '#eab308'];
+            const neighborCoordsList = [vecino1Coords, vecino2Coords, vecino3Coords, vecino4Coords, vecino5Coords, vecino6Coords, vecino7Coords, vecino8Coords];
+            const neighborIds = ['003104006006', '003104006010', '003104006007', '003104006011', '003104006012', '003104006013', '003104006014', '003104006024'];
+            const allPolygons = [origenPolygon];
 
-            const vecino2Polygon = L.polygon(vecino2Coords, {
-                color: '#8b5cf6',
-                fillColor: '#8b5cf6',
-                fillOpacity: 0.4,
-                weight: 2
-            }).addTo(map);
-            vecino2Polygon.bindPopup('<b>Predio Vecino 2</b><br>ID: 003203001015');
-
-            const vecino3Polygon = L.polygon(vecino3Coords, {
-                color: '#10b981',
-                fillColor: '#10b981',
-                fillOpacity: 0.4,
-                weight: 2
-            }).addTo(map);
-            vecino3Polygon.bindPopup('<b>Predio Vecino 3</b><br>ID: 003203001012');
-
-            const vecino4Polygon = L.polygon(vecino4Coords, {
-                color: '#f59e0b',
-                fillColor: '#f59e0b',
-                fillOpacity: 0.4,
-                weight: 2
-            }).addTo(map);
-            vecino4Polygon.bindPopup('<b>Predio Vecino 4</b><br>ID: 003203001013');
+            for (let i = 0; i < neighborCoordsList.length; i++) {
+                const neighborPoly = L.polygon(neighborCoordsList[i], {
+                    color: colors[i],
+                    fillColor: colors[i],
+                    fillOpacity: 0.4,
+                    weight: 2
+                }).addTo(map);
+                neighborPoly.bindPopup(`<b>Predio Vecino (ST_Touches)</b><br>ID: ${neighborIds[i]}`);
+                allPolygons.push(neighborPoly);
+            }
 
             // Fit map to polygons
-            const group = new L.featureGroup([origenPolygon, vecino1Polygon, vecino2Polygon, vecino3Polygon, vecino4Polygon]);
+            const group = new L.featureGroup(allPolygons);
             map.fitBounds(group.getBounds(), { padding: [30, 30] });
         }
     </script>
